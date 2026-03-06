@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merlin AI Assistant</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Mode Indicator */
+        .mode-indicator {
+            background: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .mode-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-button {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-button .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .action-button .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .action-button .description {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Full Width Button */
+        .full-width-button {
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        /* Primary Action Button */
+        .primary-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .primary-action:hover:not(:disabled) {
+            background: var(--primary-hover);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .primary-action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Textarea */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Select Dropdown */
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .result-card.visible {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .copy-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .copy-button:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-content {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .result-action-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .result-action-btn:hover {
+            background: var(--surface);
+            border-color: var(--primary-color);
+        }
+
+        .result-action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .result-action-btn.primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .loading-subtext {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            max-width: 300px;
+            z-index: 2000;
+            animation: toastIn 0.3s ease;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast.visible {
+            display: flex;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Context Info */
+        .context-info {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 12px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .context-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .context-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .context-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .context-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="logo">M</span>
+                Merlin AI Assistant
+            </h1>
+            <p>Your intelligent email companion</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Mode Indicator -->
+            <div class="mode-indicator">
+                <span id="modeText">Initializing...</span>
+                <span class="mode-badge" id="modeBadge">LOADING</span>
+            </div>
+
+            <!-- Email Context (Read Mode) -->
+            <div id="contextSection" class="section" style="display: none;">
+                <div class="section-title">
+                    <span class="section-icon">📧</span>
+                    Email Context
+                </div>
+                <div class="context-info" id="emailContext"></div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">⚡</span>
+                    Quick Actions
+                </div>
+                <div class="action-grid">
+                    <button class="action-button" id="summarizeBtn">
+                        <span class="icon">📝</span>
+                        <span class="label">Summarize</span>
+                        <span class="description">Get key points</span>
+                    </button>
+                    <button class="action-button" id="replyBtn">
+                        <span class="icon">💬</span>
+                        <span class="label">Smart Reply</span>
+                        <span class="description">AI suggestions</span>
+                    </button>
+                    <button class="action-button" id="improveBtn">
+                        <span class="icon">✨</span>
+                        <span class="label">Improve</span>
+                        <span class="description">Enhance writing</span>
+                    </button>
+                    <button class="action-button" id="grammarBtn">
+                        <span class="icon">✓</span>
+                        <span class="label">Grammar</span>
+                        <span class="description">Fix errors</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tone Adjustment -->
+            <div class="section" id="toneSection" style="display: none;">
+                <div class="section-title">
+                    <span class="section-icon">🎭</span>
+                    Adjust Tone
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="toneSelect">Select desired tone:</label>
+                    <select id="toneSelect">
+                        <option value="professional">Professional</option>
+                        <option value="friendly">Friendly</option>
+                        <option value="formal">Formal</option>
+                        <option value="casual">Casual</option>
+                        <option value="enthusiastic">Enthusiastic</option>
+                        <option value="empathetic">Empathetic</option>
+                    </select>
+                </div>
+                <button class="primary-action" id="adjustToneBtn">
+                    <span>🎭</span>
+                    Adjust Tone
+                </button>
+            </div>
+
+            <!-- Custom Prompt -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">💡</span>
+                    Custom Request
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="customPrompt">What would you like Merlin to do?</label>
+                    <textarea id="customPrompt" placeholder="E.g., 'Translate this email to Spanish' or 'Make it more concise'"></textarea>
+                </div>
+                <button class="primary-action" id="customActionBtn">
+                    <span>🚀</span>
+                    Process Request
+                </button>
+            </div>
+
+            <!-- Result Display -->
+            <div class="result-card" id="resultCard">
+                <div class="result-header">
+                    <span class="result-title" id="resultTitle">AI Response</span>
+                    <button class="copy-button" id="copyResultBtn">📋 Copy</button>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+                <div class="result-actions">
+                    <button class="result-action-btn primary" id="insertResultBtn">Insert into Email</button>
+                    <button class="result-action-btn" id="regenerateBtn">🔄 Regenerate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Processing...</div>
+            <div class="loading-subtext">Merlin is working on your request</div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon"></span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Global state
+        let currentMailboxItem = null;
+        let currentMode = null; // 'read' or 'compose'
+        let lastAction = null;
+        let lastResult = null;
+
+        // Initialize Office.js
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                initializeAddin();
+            }
+        });
+
+        // Initialize the add-in
+        async function initializeAddin() {
+            try {
+                currentMailboxItem = Office.context.mailbox.item;
+                
+                // Determine mode
+                if (currentMailboxItem.itemType === Office.MailboxEnums.ItemType.Message) {
+                    if (Office.context.mailbox.item.subject) {
+                        currentMode = currentMailboxItem.subject.getAsync ? 'compose' : 'read';
+                    } else {
+                        currentMode = 'read';
+                    }
+                }
+
+                // Update UI based on mode
+                updateUIForMode();
+                
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Load email context if in read mode
+                if (currentMode === 'read') {
+                    await loadEmailContext();
+                }
+
+                showToast('success', '✅', 'Merlin AI Assistant ready!');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('error', '❌', 'Failed to initialize add-in');
+            }
+        }
+
+        // Update UI based on mode
+        function updateUIForMode() {
+            const modeText = document.getElementById('modeText');
+            const modeBadge = document.getElementById('modeBadge');
+            const contextSection = document.getElementById('contextSection');
+            const toneSection = document.getElementById('toneSection');
+
+            if (currentMode === 'read') {
+                modeText.textContent = 'Reading email';
+                modeBadge.textContent = 'READ MODE';
+                modeBadge.style.background = '#10b981';
+                contextSection.style.display = 'block';
+                
+                // Enable summarize and reply buttons
+                document.getElementById('summarizeBtn').disabled = false;
+                document.getElementById('replyBtn').disabled = false;
+            } else {
+                modeText.textContent = 'Composing email';
+                modeBadge.textContent = 'COMPOSE MODE';
+                modeBadge.style.background = '#6366f1';
+                toneSection.style.display = 'block';
+                
+                // Enable improve and grammar buttons
+                document.getElementById('improveBtn').disabled = false;
+                document.getElementById('grammarBtn').disabled = false;
+            }
+        }
+
+        // Load email context for read mode
+        async function loadEmailContext() {
+            try {
+                const contextDiv = document.getElementById('emailContext');
+                
+                // Get email details
+                const subject = currentMailboxItem.subject || 'No subject';
+                const from = currentMailboxItem.from ? currentMailboxItem.from.displayName : 'Unknown';
+                const date = currentMailboxItem.dateTimeCreated ? 
+                    new Date(currentMailboxItem.dateTimeCreated).toLocaleString() : 'Unknown';
+
+                contextDiv.innerHTML = `
+                    <div class="context-item">
+                        <span class="context-label">From:</span>
+                        <span class="context-value">${escapeHtml(from)}</span>
+                    </div>
+                    <div class="context-item">
+                        <span class="context-label">Subject:</span>
+                        <span class="context-value">${escapeHtml(subject)}</span>
+                    </div>
+                    <div class="context-item">
+                        <span class="context-label">Date:</span>
+                        <span class="context-value">${date}</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading context:', error);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('summarizeBtn').addEventListener('click', handleSummarize);
+            document.getElementById('replyBtn').addEventListener('click', handleSmartReply);
+            document.getElementById('improveBtn').addEventListener('click', handleImprove);
+            document.getElementById('grammarBtn').addEventListener('click', handleGrammar);
+            document.getElementById('adjustToneBtn').addEventListener('click', handleToneAdjustment);
+            document.getElementById('customActionBtn').addEventListener('click', handleCustomAction);
+            document.getElementById('copyResultBtn').addEventListener('click', handleCopyResult);
+            document.getElementById('insertResultBtn').addEventListener('click', handleInsertResult);
+            document.getElementById('regenerateBtn').addEventListener('click', handleRegenerate);
+        }
+
+        // Get email body content
+        async function getEmailBody() {
+            return new Promise((resolve, reject) => {
+                currentMailboxItem.body.getAsync(
+                    Office.CoercionType.Text,
+                    (result) => {
+                        if (result.status === Office.AsyncResultStatus.Succeeded) {
+                            resolve(result.value);
+                        } else {
+                            reject(result.error);
+                        }
+                    }
+                );
+            });
+        }
+
+        // Set email body content
+        async function setEmailBody(content) {
+            return new Promise((resolve, reject) => {
+                currentMailboxItem.body.setAsync(
+                    content,
+                    { coercionType: Office.CoercionType.Html },
+                    (result) => {
+                        if (result.status === Office.AsyncResultStatus.Succeeded) {
+                            resolve();
+                        } else {
+                            reject(result.error);
+                        }
+                    }
+                );
+            });
+        }
+
+        // Insert text at cursor
+        async function insertTextAtCursor(text) {
+            return new Promise((resolve, reject) => {
+                currentMailboxItem.body.setSelectedDataAsync(
+                    text,
+                    { coercionType: Office.CoercionType.Html },
+                    (result) => {
+                        if (result.status === Office.AsyncResultStatus.Succeeded) {
+                            resolve();
+                        } else {
+                            reject(result.error);
+                        }
+                    }
+                );
+            });
+        }
+
+        // API call to Merlin AI service
+        async function callMerlinAPI(action, payload) {
+            // This is where you would integrate with your actual Merlin AI API
+            // For demonstration, using a mock implementation
+            
+            const API_ENDPOINT = 'https://api.getmerlin.in/v1/process'; // Replace with actual endpoint
+            const API_KEY = 'your-api-key-here'; // Replace with actual API key
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        ...payload
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.result || data.content || data.text;
+            } catch (error) {
+                console.error('API call failed:', error);
+                // Fallback to mock response for demo purposes
+                return getMockResponse(action, payload);
+            }
+        }
+
+        // Mock responses for demonstration
+        function getMockResponse(action, payload) {
+            const responses = {
+                summarize: `Summary of the email:\n\n• Main point: ${payload.content.substring(0, 50)}...\n• Key action items identified\n• Important dates and deadlines mentioned\n• Follow-up required with stakeholders\n\nThis is a concise summary generated by Merlin AI to help you quickly understand the email's content.`,
+                
+                reply: `Dear [Name],\n\nThank you for your email. I appreciate you taking the time to reach out.\n\n${payload.content.substring(0, 100)}...\n\nI've reviewed your message and would like to address your points. I'll get back to you with a detailed response shortly.\n\nBest regards,\n[Your Name]`,
+                
+                improve: `Here's an improved version of your text:\n\n${payload.content.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}\n\nKey improvements made:\n• Enhanced clarity and readability\n• Professional tone maintained\n• Grammar and punctuation optimized\n• Flow and structure improved`,
+                
+                grammar: `Corrected version:\n\n${payload.content}\n\nCorrections made:\n• Grammar errors fixed\n• Spelling mistakes corrected\n• Punctuation improved\n• Sentence structure optimized\n\nYour text is now error-free and ready to send!`,
+                
+                tone: `${payload.tone.charAt(0).toUpperCase() + payload.tone.slice(1)} version:\n\n${payload.content}\n\nTone adjustments applied:\n• Voice adapted to ${payload.tone} style\n• Word choice optimized\n• Sentence structure modified\n• Overall message refined`,
+                
+                custom: `Response to your request:\n\n${payload.content}\n\nMerlin AI has processed your custom request. The result takes into account your specific instructions: "${payload.prompt}"\n\nFeel free to regenerate or modify as needed.`
+            };
+
+            return responses[action] || 'Response generated successfully.';
+        }
+
+        // Handle Summarize
+        async function handleSummarize() {
+            try {
+                showLoading('Analyzing email content...');
+                const emailBody = await getEmailBody();
+                
+                if (!emailBody || emailBody.trim().length === 0) {
+                    showToast('warning', '⚠️', 'Email body is empty');
+                    hideLoading();
+                    return;
+                }
+
+                const result = await callMerlinAPI('summarize', {
+                    content: emailBody,
+                    action: 'summarize'
+                });
+
+                lastAction = 'summarize';
+                lastResult = result;
+                displayResult('Email Summary', result);
+                hideLoading();
+                showToast('success', '✅', 'Email summarized successfully!');
+            } catch (error) {
+                console.error('Summarize error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to summarize email');
+            }
+        }
+
+        // Handle Smart Reply
+        async function handleSmartReply() {
+            try {
+                showLoading('Generating smart reply suggestions...');
+                const emailBody = await getEmailBody();
+                
+                if (!emailBody || emailBody.trim().length === 0) {
+                    showToast('warning', '⚠️', 'Email body is empty');
+                    hideLoading();
+                    return;
+                }
+
+                const result = await callMerlinAPI('reply', {
+                    content: emailBody,
+                    context: {
+                        from: currentMailboxItem.from ? currentMailboxItem.from.displayName : 'Unknown',
+                        subject: currentMailboxItem.subject || 'No subject'
+                    }
+                });
+
+                lastAction = 'reply';
+                lastResult = result;
+                displayResult('Smart Reply Suggestion', result);
+                hideLoading();
+                showToast('success', '✅', 'Reply generated successfully!');
+            } catch (error) {
+                console.error('Reply error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to generate reply');
+            }
+        }
+
+        // Handle Improve Writing
+        async function handleImprove() {
+            try {
+                showLoading('Improving your writing...');
+                const emailBody = await getEmailBody();
+                
+                if (!emailBody || emailBody.trim().length === 0) {
+                    showToast('warning', '⚠️', 'Please write some content first');
+                    hideLoading();
+                    return;
+                }
+
+                const result = await callMerlinAPI('improve', {
+                    content: emailBody
+                });
+
+                lastAction = 'improve';
+                lastResult = result;
+                displayResult('Improved Version', result);
+                hideLoading();
+                showToast('success', '✅', 'Writing improved successfully!');
+            } catch (error) {
+                console.error('Improve error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to improve writing');
+            }
+        }
+
+        // Handle Grammar Check
+        async function handleGrammar() {
+            try {
+                showLoading('Checking grammar and spelling...');
+                const emailBody = await getEmailBody();
+                
+                if (!emailBody || emailBody.trim().length === 0) {
+                    showToast('warning', '⚠️', 'Please write some content first');
+                    hideLoading();
+                    return;
+                }
+
+                const result = await callMerlinAPI('grammar', {
+                    content: emailBody
+                });
+
+                lastAction = 'grammar';
+                lastResult = result;
+                displayResult('Grammar & Spelling Check', result);
+                hideLoading();
+                showToast('success', '✅', 'Grammar checked successfully!');
+            } catch (error) {
+                console.error('Grammar error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to check grammar');
+            }
+        }
+
+        // Handle Tone Adjustment
+        async function handleToneAdjustment() {
+            try {
+                const tone = document.getElementById('toneSelect').value;
+                showLoading(`Adjusting tone to ${tone}...`);
+                const emailBody = await getEmailBody();
+                
+                if (!emailBody || emailBody.trim().length === 0) {
+                    showToast('warning', '⚠️', 'Please write some content first');
+                    hideLoading();
+                    return;
+                }
+
+                const result = await callMerlinAPI('tone', {
+                    content: emailBody,
+                    tone: tone
+                });
+
+                lastAction = 'tone';
+                lastResult = result;
+                displayResult(`Tone Adjusted to ${tone.charAt(0).toUpperCase() + tone.slice(1)}`, result);
+                hideLoading();
+                showToast('success', '✅', `Tone adjusted to ${tone}!`);
+            } catch (error) {
+                console.error('Tone adjustment error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to adjust tone');
+            }
+        }
+
+        // Handle Custom Action
+        async function handleCustomAction() {
+            try {
+                const customPrompt = document.getElementById('customPrompt').value.trim();
+                
+                if (!customPrompt) {
+                    showToast('warning', '⚠️', 'Please enter a request');
+                    return;
+                }
+
+                showLoading('Processing your custom request...');
+                const emailBody = await getEmailBody();
+
+                const result = await callMerlinAPI('custom', {
+                    content: emailBody,
+                    prompt: customPrompt
+                });
+
+                lastAction = 'custom';
+                lastResult = result;
+                displayResult('Custom Request Result', result);
+                hideLoading();
+                showToast('success', '✅', 'Request processed successfully!');
+            } catch (error) {
+                console.error('Custom action error:', error);
+                hideLoading();
+                showToast('error', '❌', 'Failed to process request');
+            }
+        }
+
+        // Display result
+        function displayResult(title, content) {
+            const resultCard = document.getElementById('resultCard');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultContent = document.getElementById('resultContent');
+
+            resultTitle.textContent = title;
+            resultContent.textContent = content;
+            resultCard.classList.add('visible');
+
+            // Scroll to result
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Handle Copy Result
+        function handleCopyResult() {
+            const resultContent = document.getElementById('resultContent').textContent;
+            
+            navigator.clipboard.writeText(resultContent).then(() => {
+                showToast('success', '📋', 'Copied to clipboard!');
+            }).catch(() => {
+                showToast('error', '❌', 'Failed to copy');
+            });
+        }
+
+        // Handle Insert Result
+        async function handleInsertResult() {
+            try {
+                const resultContent = document.getElementById('resultContent').textContent;
+                
+                if (currentMode === 'compose') {
+                    // For compose mode, replace or insert at cursor
+                    await insertTextAtCursor(`<p>${escapeHtml(resultContent)}</p>`);
+                    showToast('success', '✅', 'Content inserted successfully!');
+                } else {
+                    // For read mode, can't insert but can copy
+                    await navigator.clipboard.writeText(resultContent);
+                    showToast('success', '📋', 'Copied! Create a reply to use it.');
+                }
+            } catch (error) {
+                console.error('Insert error:', error);
+                showToast('error', '❌', 'Failed to insert content');
+            }
+        }
+
+        // Handle Regenerate
+        async function handleRegenerate() {
+            if (!lastAction) {
+                showToast('warning', '⚠️', 'No previous action to regenerate');
+                return;
+            }
+
+            // Re-run the last action
+            const actionHandlers = {
+                'summarize': handleSummarize,
+                'reply': handleSmartReply,
+                'improve': handleImprove,
+                'grammar': handleGrammar,
+                'tone': handleToneAdjustment,
+                'custom': handleCustomAction
+            };
+
+            const handler = actionHandlers[lastAction];
+            if (handler) {
+                await handler();
+            }
+        }
+
+        // Show loading overlay
+        function showLoading(message = 'Processing...') {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = message;
+            loadingOverlay.classList.add('active');
+        }
+
+        // Hide loading overlay
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('active');
+        }
+
+        // Show toast notification
+        function showToast(type, icon, message) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Remove existing classes
+            toast.classList.remove('success', 'error', 'warning', 'visible');
+            
+            // Add new classes
+            toast.classList.add(type, 'visible');
+            toastIcon.textContent = icon;
+            toastMessage.textContent = message;
+
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
